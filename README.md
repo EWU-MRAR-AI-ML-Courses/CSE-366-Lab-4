@@ -169,7 +169,8 @@ You can modify various parameters in run.py to customize the simulation accordin
 * Number of Robots: Change num_robots to modify the number of robots available for task assignment.
 
 * Genetic Algorithm Parameters:
-*> population_size: The size of the population in each generation.
-*> mutation_rate: The probability of mutation for each gene in an individual.
-*> n_generations: The total number of generations to run the genetic algorithm.
-*> generation_delay: The delay in milliseconds between each generation for visualization purposes.
+
+    - population_size: The size of the population in each generation.
+    - mutation_rate: The probability of mutation for each gene in an individual.
+    - n_generations: The total number of generations to run the genetic algorithm.
+    - generation_delay: The delay in milliseconds between each generation for visualization purposes.
