@@ -1,176 +1,222 @@
-# Task Scheduling Visualization with Genetic Algorithm
 
-This project implements a Genetic Algorithm (GA) to optimize the assignment of multiple robots to a set of tasks in a dynamic production environment. It aims to minimize the total production time, balance the workload among robots, and prioritize critical tasks effectively. The project includes a detailed visualization using Pygame to illustrate the final task assignments, robot efficiencies, and task priorities.
+# Local Search
 
-# Objective
-The goal of this project is to develop and implement a Genetic Algorithm to optimize task assignments in a production environment. The primary objectives are:
+This repository presents three problem solutions using local search techniques:
+1. **Vehicle Routing Problem (VRP) – Simulated Annealing:**  
+   Optimizes routes for a fleet of vehicles delivering goods by iteratively refining a solution using simulated annealing.
+2. **Vehicle Routing Problem (VRP) – Genetic Algorithm:**  
+   Uses a genetic algorithm to evolve optimal routes for vehicles, visualizing fitness and route evolution over generations.
+3. **Task Scheduling Optimization:**  
+   Implements a Genetic Algorithm to optimize task assignments for multiple robots in a dynamic production environment to minimize total production time, balance workload, and prioritize critical tasks.
 
-* Minimize Total Production Time: Reduce the maximum time taken by any robot to complete its assigned tasks.
-* Balance Workload: Ensure an even distribution of tasks among robots to prevent bottlenecks.
-Prioritize Critical Tasks: Assign higher priority tasks appropriately to meet production goals.
+---
 
-# Features
-* Dynamic Production Environment: Simulates tasks with varying durations and priorities, and robots with different efficiency factors.
-* Genetic Algorithm Optimization: Implements GA components including individual representation, fitness function, selection, crossover, and mutation.
-* Visualization: Provides a real-time graphical representation of task assignments using Pygame, highlighting robot efficiencies, task durations, and priorities.
-* Real-Time Updates: Displays generation count and best fitness scores, updating after each generation of the GA.
-# Assignment Details
-## Background
-* Tasks: Each task has a specified duration (in hours) and a priority level.
-* Robots: Each robot has a unique efficiency factor influencing how quickly it can complete tasks.
-* Dynamic Environment: Tasks and their priorities can change over time, simulating a real-world production scenario.
-## Tasks
+## Objective
+
+The goal of these projects is to explore different local search methods (Simulated Annealing and Genetic Algorithms) to solve complex optimization problems. Specifically, the objectives are:
+
+- **VRP Solutions:**  
+  - Determine optimal routes for a fleet of vehicles (starting and ending at a central depot) that visit all delivery points.
+  - Minimize the total distance traveled (or total production time in a task scheduling context) while balancing the workload.
+  
+- **Task Scheduling Optimization:**  
+  - Minimize total production time.
+  - Balance task assignments among robots.
+  - Prioritize high-priority tasks to meet production goals.
+
+---
+
+## Features
+
+- **Dynamic Environment:**  
+  Simulates delivery points and tasks with varying durations, priorities, and robot efficiencies.
+  
+- **Local Search Optimization:**  
+  - **Simulated Annealing:** Gradually cools the solution space to escape local minima in VRP.
+  - **Genetic Algorithm:** Evolves candidate solutions over generations for VRP and task scheduling.
+  
+- **Visualization:**  
+  Uses Pygame to provide a real-time graphical representation:
+  - For VRP (SA and GA): Displays evolving routes, best solutions per generation, and dynamic fitness metrics.
+  - For Task Scheduling: Visualizes the task assignment grid, robot efficiencies, and task priorities.
+  
+- **Real-Time Metrics:**  
+  The right-side panel displays detailed metrics such as generation count, maximum and average fitness values, and explanations of fitness calculations.
+
+---
+
+## Assignment Details
+
+### Background
+
+- **VRP:**  
+  The Vehicle Routing Problem involves determining the most efficient routes for vehicles starting and ending at a central depot while visiting a set of delivery points. Constraints (e.g., vehicle capacity, time windows) may also be considered.
+
+- **Task Scheduling:**  
+  Each task is defined by a duration and priority, and each robot has an efficiency factor. The objective is to assign tasks such that total production time is minimized, workload is balanced, and critical tasks are prioritized.
+
 ### Data Preparation
-Generate mock data for tasks and robots:
 
-```import numpy as np
+For the task scheduling problem, mock data can be generated as follows:
 
-# Generate mock data
+```python
+import numpy as np
+
+# Generate mock data for task scheduling
 task_durations = np.random.randint(1, 11, size=10)       # Task durations (1 to 10 hours)
-task_priorities = np.random.randint(1, 6, size=10)       # Task priorities (1 to 5)
-robot_efficiencies = np.random.uniform(0.5, 1.5, size=5) # Robot efficiencies (0.5x to 1.5x)
+task_priorities = np.random.randint(1, 6, size=10)         # Task priorities (1 to 5)
+robot_efficiencies = np.random.uniform(0.5, 1.5, size=5)   # Robot efficiencies (0.5x to 1.5x)
 ```
 
-* Task Durations: Randomly assigned durations between 1 and 10 hours.
-* Task Priorities: Random priority levels between 1 (lowest) and 5 (highest).
-* Robot Efficiencies: Random efficiency factors between 0.5 (50% efficiency) and 1.5 (150% efficiency).
-### GA Implementation
-Implement the Genetic Algorithm to optimize task assignments:
+---
 
-```
-# Initialize GA parameters
+## Genetic Algorithm Implementation (for Task Scheduling and VRP)
 
-population_size = 50
-n_generations = 100
-mutation_rate = 0.1 
-
-# Create initial population
-population = [np.random.randint(0, len(robot_efficiencies), size=len(task_durations)) for _ in range(population_size)]
-```
-
-* Population Size: The number of individuals (possible solutions) in each generation.
-* Number of Generations: Total iterations the GA will perform to evolve solutions.
-* Mutation Rate: Probability of mutation for each gene in an individual.
-
-### Visualization
-Create a grid visualization of the task assignments highlighting key information:
-
-* Grid Representation: Rows represent robots, columns represent tasks.
-* Color Coding: Cells are colored based on task durations; assigned tasks are highlighted.
-* Annotations: Display task priorities and durations within each cell.
-* Robot Efficiencies: Displayed alongside each robot row.
-## Genetic Algorithm Components
 ### Individual Representation
-Each individual in the population represents a potential task assignment solution:
 
-* Representation: An array/vector where each element corresponds to a task and contains the ID of the assigned robot.
-Example:
+Each individual represents a possible solution:
+- **For Task Scheduling:**  
+  An array where each element corresponds to a task and contains the ID of the assigned robot.
+  
+- **For VRP (GA):**  
+  A permutation of delivery points assigned to a vehicle (the complete route is: depot → deliveries → depot).
 
-```
-# Individual representation
-I = [r0, r1, r2, ..., rN]
-# Where rN is the robot assigned to task N
-```
 ### Fitness Function
-The fitness function evaluates how good each individual solution is:
 
-* Total Production Time (T_total): Calculated as the maximum time taken by any robot to complete its assigned tasks.
-* Workload Balance (B): The standard deviation of the total times across all robots, promoting balanced task distribution.
-* Fitness Function (F): Combines total production time and workload balance, incorporating task priorities to penalize delays in high-priority tasks.
+**VRP Example:**
 
-Calculation:
-
+```python
+def fitness(route):
+    # Calculate the total distance (depot -> route -> depot)
+    total_distance = distance(depot, route[0]) + \
+                     sum(distance(route[i], route[i+1]) for i in range(len(route)-1)) + \
+                     distance(route[-1], depot)
+    return 1 / (total_distance + 1e-6)  # Higher fitness for shorter routes
 ```
+
+**Task Scheduling Example:**
+
+```python
 def fitness(individual):
     robot_times = np.zeros(len(robot_efficiencies))
     for task_idx, robot_idx in enumerate(individual):
         duration = task_durations[task_idx]
         priority = task_priorities[task_idx]
         efficiency = robot_efficiencies[robot_idx]
-        # Effective time considering efficiency and priority
-        effective_time = (duration / efficiency) * priority
+        effective_time = (duration / efficiency) * priority  # Time weighted by priority and efficiency
         robot_times[robot_idx] += effective_time
     T_total = np.max(robot_times)
     B = np.std(robot_times)
-    F = T_total + B  # Fitness value to minimize
+    F = T_total + B  # Fitness to minimize
     return F
 ```
 
-* Objective: Minimize F to find the optimal task assignment.
+*Objective:* Minimize the fitness value (or maximize its inverse for VRP).
+
 ### Selection, Crossover, and Mutation
-Implement genetic operations to evolve the population:
 
-* Selection: Choose the fittest individuals to be parents for the next generation.
-```
-def selection(population):
-    # Select the top half individuals based on fitness
-    sorted_population = sorted(population, key=fitness)
-    return sorted_population[:len(population) // 2]
-```
+- **Selection:**  
+  Selects the fittest individuals (e.g., using tournament selection or sorting).
 
-* Crossover: Combine pairs of parent individuals to create offspring.
-```
-def crossover(parent1, parent2):
-    # Single-point crossover
-    point = np.random.randint(1, len(parent1) - 1)
-    child = np.concatenate([parent1[:point], parent2[point:]])
-    return child
-```
-* Mutation: Introduce random changes to offspring to maintain genetic diversity.
-```
-def mutate(individual):
-    for i in range(len(individual)):
-        if np.random.rand() < mutation_rate:
-            individual[i] = np.random.randint(0, len(robot_efficiencies))
-    return individual
-```
-# Installation
-1. Clone the repository:
+- **Crossover:**  
+  Combines parts of two parent solutions (e.g., single-point or order crossover for VRP).
 
-```
-git clone https://github.com/yourusername/your-repo-name.git
-cd your-repo-name
-```
+- **Mutation:**  
+  Introduces random changes to maintain diversity (e.g., swap mutation).
 
-2. Set up a virtual environment (optional but recommended):
+---
 
-```
-python -m venv venv
-source venv/bin/activate  # On Windows use `venv\Scripts\activate`
-```
-3. Install the required dependencies:
+## Installation
 
-```
-pip install -r requirements.txt
-```
-If a requirements.txt file is not provided, install dependencies manually:
-```
-pip install pygame numpy
-```
+1. **Clone the Repository:**
+
+   ```bash
+   git clone https://github.com/yourusername/your-repo-name.git
+   cd your-repo-name
+   ```
+
+2. **Set Up a Virtual Environment (Optional but Recommended):**
+
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows use: venv\Scripts\activate
+   ```
+
+3. **Install Dependencies:**
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+   If no `requirements.txt` is provided, install manually:
+   ```bash
+   pip install pygame numpy
+   ```
+
+---
+
 ## Usage
+
 Run the main script to start the visualization:
-```
+
+```bash
 python run.py
 ```
-A Pygame window will open, displaying the task assignment grid and updates on the genetic algorithm's progress.
+
+A Pygame window will open, displaying:
+- **Top Area (Left):**  
+  The GA or SA process visualization (routes evolving, fitness metrics updating).
+- **Bottom Area (Left):**  
+  The final optimized routes with animated vehicles (for VRP solutions).
+- **Right Panel:**  
+  Detailed problem description, instructions, and real-time GA metrics (generation, max fitness, average fitness) along with fitness calculation details.
 
 ### Controls
-* Exit: Close the Pygame window by clicking the close button to exit the application.
+
+- **Start GA/SA Simulation:**  
+  Click the "Solve VRP" button in the top area to start the optimization.
+  
+- **Start Vehicle Simulation:**  
+  After the GA/SA process completes, click the "Start Simulation" button in the bottom area to animate the vehicles.
+  
+- **Exit:**  
+  Close the Pygame window to exit the application.
+
+---
 
 ## Project Structure
-* run.py: The main script that initializes the environment, runs the genetic algorithm, and handles the visualization.
-* agent.py: Contains the Agent class, representing a robot agent with an efficiency factor and methods for task management.
-* environment.py: Defines the Environment class that sets up tasks and robots, and provides methods for generating initial assignments and drawing the visualization grid.
 
-# Customization
-You can modify various parameters in run.py to customize the simulation according to your needs:
+- **run.py:**  
+  The main script that initializes the environment, runs the optimization algorithm (GA and SA for VRP, and task scheduling), and handles the visualization.
+- **agent.py:**  
+  Contains the algorithm implementations (both Genetic Algorithm and Simulated Annealing for VRP, as well as task scheduling optimization methods).
+- **environment.py:**  
+  Defines the environment for tasks, deliveries, and robots. It generates the depot, tasks, and delivery points.
+- **README.md:**  
+  This file, providing an overview of the project, objectives, and usage instructions.
 
-* Number of Tasks: Adjust num_tasks to change the total number of tasks in the simulation.
-* Number of Robots: Change num_robots to modify the number of robots available for task assignment.
+---
 
-* Genetic Algorithm Parameters:
+## Customization
 
-    - population_size: The size of the population in each generation.
-    - mutation_rate: The probability of mutation for each gene in an individual.
-    - n_generations: The total number of generations to run the genetic algorithm.
-    - generation_delay: The delay in milliseconds between each generation for visualization purposes.
+You can modify various parameters in the code to tailor the simulation:
+
+- **Number of Tasks/Deliveries:**  
+  Adjust the values in the environment.
+  
+- **Number of Robots/Vehicles:**  
+  Modify the corresponding parameters to change available resources.
+  
+- **Genetic Algorithm Parameters:**
+  - `population_size`
+  - `mutation_rate`
+  - `n_generations` (or `max_generations`)
+  - `generation_delay` (if you add delays for visualization)
+
+- **Optimization Method:**  
+  Switch between Simulated Annealing and Genetic Algorithm solutions by running the respective module.
+
+---
+
+This repository demonstrates multiple local search solutions, showcasing how different algorithms can be applied to solve optimization problems in real-time with visualization.
+
+Happy coding and optimizing!
